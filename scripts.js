@@ -147,11 +147,52 @@ function playerRotate(dir) {
 }
 //Draws the game board and the pieces
 function draw() {
+    context.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
     context.fillStyle = '#000';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    drawMatrix(arena, {x: 0, y: 0});
-    drawMatrix(player.matrix, player.pos);
+    context.fillRect(0, 0, canvas.width, canvas.height); // Draw the game background
+    drawGrid(); // Draw the grid
+    drawShadow(); // Draw the piece shadow with reduced opacity
+    drawMatrix(arena, {x: 0, y: 0}); // Draw the static blocks in the arena
+    drawMatrix(player.matrix, player.pos); // Draw the moving piece
 }
+//Draws a grid on the canvas
+function drawGrid() {
+    const gridColor = 'rgba(255, 255, 255, 0.1)'; // Light grid color for subtlety
+    context.beginPath();
+    for (let i = 0; i <= canvas.width / 20; i++) {
+        context.moveTo(i, 0);
+        context.lineTo(i, canvas.height / 20);
+    }
+    for (let j = 0; j <= canvas.height / 20; j++) {
+        context.moveTo(0, j);
+        context.lineTo(canvas.width / 20, j);
+    }
+    context.strokeStyle = gridColor;
+    context.lineWidth = 0.05; // Thin lines for the grid, considering the scale
+    context.stroke();
+}
+// Draws the shadow of the player's piece
+function drawShadow() {
+    const shadow = JSON.parse(JSON.stringify(player)); // Deep copy the player object
+    while (!collide(arena, shadow)) {
+        shadow.pos.y++;
+    }
+    shadow.pos.y--; // Move back to the last non-colliding position
+
+    // Reduced alpha value for a very subtle shadow
+    context.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    shadow.matrix.forEach((row, y) => {
+        row.forEach((value, x) => {
+            if (value !== 0) {
+                // Draw a semi-transparent block for the shadow
+                context.fillRect(x + shadow.pos.x, y + shadow.pos.y, 1, 1);
+            }
+        });
+    });
+}
+
+
+
 //Draws the pieces
 function drawMatrix(matrix, offset) {
     matrix.forEach((row, y) => {
