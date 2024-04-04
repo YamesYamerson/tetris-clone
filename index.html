@@ -3,6 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <title>Tetris Clone</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 10px;
+        }
+        .top-container {
+            display: flex;
+            justify-content: space-between;
+            width: 240px; /* Match the width of the Tetris canvas */
+            align-items: center; /* Align items vertically */
+        }
+        #holdPiece {
+            width: 80px; /* Container width */
+            height: 80px; /* Container height */
+            background-color: #333; /* Dark grey background */
+            border: 2px solid black; /* Black outline */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #holdCanvas {
+            /* Set to the actual pixel dimensions you need for the tetrominoes */
+            /* Don't use width and height here to avoid scaling */
+            background-color: #333;
+        }
+    </style>
 </head>
 <body>
     <div class="game-options">
@@ -12,7 +41,7 @@
     </div>
     <div class="top-container">
         <div id="holdPiece">
-            <p>Held Piece</p>
+            <!-- Set the canvas size to match the scale of the tetrominoes -->
             <canvas id="holdCanvas" width="80" height="80"></canvas>
         </div>
         <p>Score: <span id="score">0</span></p>

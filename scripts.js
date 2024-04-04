@@ -255,10 +255,39 @@ function draw() {
 //Draws the held piece in a canvas
 function drawHoldPiece(matrix) {
     holdContext.clearRect(0, 0, holdCanvas.width, holdCanvas.height);
+
     if (matrix) {
-        drawMatrix(matrix, { x: 1, y: 1 }, holdContext); // Use hold context here
+        // Calculate the bounding box of the tetrimino
+        let minX = matrix[0].length, maxX = 0, minY = matrix.length, maxY = 0;
+        for (let y = 0; y < matrix.length; y++) {
+            for (let x = 0; x < matrix[y].length; x++) {
+                if (matrix[y][x] !== 0) {
+                    minX = Math.min(minX, x);
+                    maxX = Math.max(maxX, x);
+                    minY = Math.min(minY, y);
+                    maxY = Math.max(maxY, y);
+                }
+            }
+        }
+
+        // Calculate the size of the bounding box
+        const boxWidth = maxX - minX + 1;
+        const boxHeight = maxY - minY + 1;
+
+        // Calculate the offset to center the bounding box in the hold canvas
+        const offsetX = (4 - boxWidth) / 2;
+        const offsetY = (4 - boxHeight) / 2;
+
+        // Adjust the position to start drawing from the top-left of the bounding box
+        drawMatrix(matrix, { x: offsetX - minX, y: offsetY - minY }, holdContext);
     }
 }
+
+
+
+
+
+
 
 
 //Draws a grid on the canvas
