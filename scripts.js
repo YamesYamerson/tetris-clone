@@ -403,12 +403,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Game started');
         }
     });
-
     // Event Listener for Pause Button
     pauseButton.addEventListener('click', togglePause);
-
-    
-    // Event Listener for Reset Button
     // Event Listener for Reset Button
 resetButton.addEventListener('click', () => {
     gameActive = true;  // Ensure the game is set as active
@@ -416,13 +412,10 @@ resetButton.addEventListener('click', () => {
 
     // Clear the game board
     arena.forEach(row => row.fill(0));
-
     // Reset player's score and position
     player.score = 0;
     playerReset();  // This will set a new piece and reset the player's position
-
     updateScore();  // Update the score display
-
     // Ensure the game loop is running
     if (!lastTime) { // Check if the game loop is not already running
         lastTime = performance.now();
