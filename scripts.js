@@ -105,6 +105,31 @@ function arenaSweep() {
     }
 }
 //Logic for when the player's piece drops and collides
+//Checks for full lines and clears them, also shifts arena down
+function arenaSweep() {
+    let rowCount = 0;
+    outer: for (let y = arena.length - 1; y >= 0; --y) {
+        for (let x = 0; x < arena[y].length; ++x) {
+            if (arena[y][x] === 0) {
+                console.log(`Row ${y} is not full.`);
+                continue outer;
+            }
+        }
+
+        console.log(`Clearing full row ${y}`);
+        const row = arena.splice(y, 1)[0].fill(0);
+        arena.unshift(row);
+        ++y;
+
+        rowCount++;
+    }
+
+    if (rowCount > 0) {
+        player.score += rowCount * 10;
+        updateScore();
+        console.log(`Cleared ${rowCount} rows, score: ${player.score}`);
+    }
+}
 function playerDrop() {
     console.log("Player dropped");
     player.pos.y++;
@@ -136,6 +161,8 @@ function togglePause() {
     document.getElementById('pauseButton').textContent = isPaused ? 'Resume Game' : 'Pause Game';
 }
 //Resets the player's piece
+
+
 function playerReset() {
     console.log("Resetting player");
     const pieces = 'TJLOSZI';
@@ -149,6 +176,7 @@ function playerReset() {
         updateScore();
     }
 }
+
 //Resets the player's piece
 function playerReset() {
     const pieces = 'TJLOSZI';
@@ -256,12 +284,19 @@ function drawMatrix(matrix, offset) {
         });
     });
 }
+
 // Variables for the game loop
 let lastTime = 0;
 let dropCounter = 0;
 let dropInterval = 1000; // Normal drop speed in milliseconds
 const fastDropInterval = 50; // Fast drop speed when down arrow is held down
 // Update function modification to respect pause state
+// Updates the game
+function update(time = 0) {
+    requestAnimationFrame(update); // Always request the next frame
+    if (!gameActive || isPaused) {
+        return; // Skip game logic if the game is not active or is paused
+    }
 function update(time = 0) {
     requestAnimationFrame(update); // Always request the next frame
 
@@ -283,6 +318,7 @@ function update(time = 0) {
 if (!isPaused && gameActive) {
     update(); // Call update to restart the game loop
 }
+
 
 // Function to hard drop the player's piece
 function playerHardDrop() {
