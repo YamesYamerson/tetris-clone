@@ -9,3 +9,36 @@ canvas {
     justify-content: center;
     margin-top: 20px;
 }
+
+.game-container {
+    display: flex;
+    align-items: start;
+    justify-content: center;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    padding: 10px;
+}
+.top-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 320px; /* Adjust based on total width of Tetris canvas and hold canvas */
+}
+#tetrisCanvas {
+    margin-top: 10px;
+}
+#holdPiece {
+    display: block;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 10px;
+    max-width: 25px !important;
+}
+#holdCanvas {
+    border: 1px solid #000; /* Add border to see the canvas area */
+}
