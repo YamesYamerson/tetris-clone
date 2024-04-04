@@ -1,21 +1,3 @@
-canvas {
-    border: 1px solid black;
-    margin: 0 auto;
-    background-color: #000;
-}
-
-.game-options{
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.game-container {
-    display: flex;
-    align-items: start;
-    justify-content: center;
-}
-
 body {
     display: flex;
     flex-direction: column;
@@ -26,19 +8,19 @@ body {
 .top-container {
     display: flex;
     justify-content: space-between;
-    width: 100%;
-    max-width: 320px; /* Adjust based on total width of Tetris canvas and hold canvas */
-}
-#tetrisCanvas {
-    margin-top: 10px;
+    width: 240px; /* Match the width of the Tetris canvas */
+    align-items: center; /* Align items vertically */
 }
 #holdPiece {
-    display: block;
-    flex-direction: column;
+    width: 40px; /* Reduced width for the hold canvas */
+    height: 40px; /* Reduced height for the hold canvas */
+    background-color: #333; /* Dark grey background */
+    border: 2px solid black; /* Black outline */
+    justify-content: center;
     align-items: center;
-    padding: 0 10px;
-    max-width: 25px !important;
 }
 #holdCanvas {
-    border: 1px solid #000; /* Add border to see the canvas area */
+    width: 100%;
+    height: 100%;
+    background-color: #333;
 }
