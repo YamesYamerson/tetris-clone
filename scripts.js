@@ -1,7 +1,8 @@
 const canvas = document.getElementById('tetrisCanvas');
 const context = canvas.getContext('2d');
 context.scale(20, 20); // Make each block 20x20 pixels on the canvas
-
+let gameActive = false;
+//Create the game board
 function createMatrix(w, h) {
     const matrix = [];
     while (h--) {
@@ -78,17 +79,75 @@ function merge(arena, player) {
         });
     });
 }
-//Clears the full lines
+// Upon collision with the bottom or another piece, check and clear any full lines
+function arenaSweep() {
+    let rowCount = 0;
+    for (let y = arena.length - 1; y >= 0; --y) {
+        let isRowComplete = true;
+        for (let x = 0; x < arena[y].length; ++x) {
+            if (arena[y][x] === 0) {
+                isRowComplete = false;
+                break;
+            }
+        }
+        // If the row is complete, move all rows above down by one
+        if (isRowComplete) {
+            arena.splice(y, 1); // Remove the full row
+            arena.unshift(new Array(arena[0].length).fill(0)); // Add an empty row at the top
+            rowCount++;
+            y++; // After removing a row, check the same row index again as it has a new row now
+        }
+    }
+
+    if (rowCount > 0) {
+        player.score += rowCount * 10; // Increase score by 10 for each cleared line
+        updateScore(); // Update the score display
+    }
+}
+//Logic for when the player's piece drops and collides
 function playerDrop() {
+    console.log("Player dropped");
     player.pos.y++;
     if (collide(arena, player)) {
+        console.log("Collision detected");
         player.pos.y--; // Move the piece back up
         merge(arena, player); // Merge it with the arena
+        console.log("Before arenaSweep");
+        arenaSweep(); // Check and clear any full lines
+        console.log("After arenaSweep");
         playerReset(); // Reset the player's piece
-        // arenaSweep(); // We will implement this later to clear full lines
-        updateScore(); // We will also implement this later
+        updateScore(); // Update the score
     }
     dropCounter = 0;
+}
+//Updates the player's score
+function updateScore() {
+    document.getElementById('score').textContent = player.score;
+}
+
+//Player Pause
+let isPaused = false;
+
+// Separate the pause toggle logic into its own function
+function togglePause() {
+    if (!gameActive) return; // Only toggle pause if the game is active
+    isPaused = !isPaused;
+    console.log(isPaused ? 'Game paused' : 'Game resumed');
+    document.getElementById('pauseButton').textContent = isPaused ? 'Resume Game' : 'Pause Game';
+}
+//Resets the player's piece
+function playerReset() {
+    console.log("Resetting player");
+    const pieces = 'TJLOSZI';
+    player.matrix = createPiece(pieces[Math.floor(pieces.length * Math.random())]);
+    player.pos.y = 0;
+    player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+    if (collide(arena, player)) {
+        console.log("Game over detected");
+        arena.forEach(row => row.fill(0));
+        player.score = 0;
+        updateScore();
+    }
 }
 //Resets the player's piece
 function playerReset() {
@@ -103,26 +162,24 @@ function playerReset() {
         updateScore(); // We will implement this function to update the UI
     }
 }
-
 // Be sure to declare updateScore function
 function updateScore() {
-    // Implement logic to update the player's score on the screen
+    document.getElementById('score').textContent = player.score;
 }
-
+// Rotates the pieces
 function rotate(matrix, dir) {
     for (let y = 0; y < matrix.length; ++y) {
         for (let x = 0; x < y; ++x) {
             [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
         }
     }
-
+    // Reverse the row order
     if (dir > 0) {
         matrix.forEach(row => row.reverse());
     } else {
         matrix.reverse();
     }
 }
-
 // Moves the player's piece left or right
 function playerMove(dir) {
     player.pos.x += dir;
@@ -178,8 +235,6 @@ function drawShadow() {
         shadow.pos.y++;
     }
     shadow.pos.y--; // Move back to the last non-colliding position
-
-    // Reduced alpha value for a very subtle shadow
     context.fillStyle = 'rgba(255, 255, 255, 0.1)';
     shadow.matrix.forEach((row, y) => {
         row.forEach((value, x) => {
@@ -190,9 +245,6 @@ function drawShadow() {
         });
     });
 }
-
-
-
 //Draws the pieces
 function drawMatrix(matrix, offset) {
     matrix.forEach((row, y) => {
@@ -204,35 +256,45 @@ function drawMatrix(matrix, offset) {
         });
     });
 }
-
+// Variables for the game loop
 let lastTime = 0;
 let dropCounter = 0;
 let dropInterval = 1000; // Normal drop speed in milliseconds
 const fastDropInterval = 50; // Fast drop speed when down arrow is held down
-
+// Update function modification to respect pause state
 function update(time = 0) {
+    requestAnimationFrame(update); // Always request the next frame
+
+    if (!gameActive || isPaused) {
+        return; // Skip game logic if the game is not active or is paused
+    }
+
     const deltaTime = time - lastTime;
     lastTime = time;
-
     dropCounter += deltaTime;
     if (dropCounter > dropInterval) {
         playerDrop();
+        dropCounter = 0;
     }
-
     draw();
-    requestAnimationFrame(update);
 }
 
+// Ensure update is called when unpausing
+if (!isPaused && gameActive) {
+    update(); // Call update to restart the game loop
+}
+
+// Function to hard drop the player's piece
 function playerHardDrop() {
     while (!collide(arena, player)) {
         player.pos.y++;
     }
-    player.pos.y--;
-    merge(arena, player);
-    playerReset();
+    player.pos.y--; // Move the piece back up to the last valid position
+    merge(arena, player); // Merge it with the arena
+    arenaSweep(); // Check and clear any full lines
+    playerReset(); // Reset the player's piece
+    updateScore(); // Update the score
 }
-
-
 // Colors for the pieces
 const colors = [
     null,
@@ -251,25 +313,95 @@ const player = {
     matrix: null,
     score: 0,
 };
-//Controls for key push events
+// Keyboard controls
 document.addEventListener('keydown', event => {
-    if (event.keyCode === 37) { // Left arrow
-        playerMove(-1);
-    } else if (event.keyCode === 39) { // Right arrow
-        playerMove(1);
-    } else if (event.keyCode === 38) { // Up arrow
-        playerRotate(1);
-    } else if (event.keyCode === 40) { // Down arrow
-        dropInterval = 50; // Set for fast drop
-    } else if (event.keyCode === 32) { // Spacebar for hard drop
-        playerHardDrop();
+    if (event.keyCode === 32) { // Spacebar
+        event.preventDefault(); // Prevent the default spacebar action
     }
-});
-//Controls for key release events
+
+    if (isPaused) {
+        // Check if the 'P' key is pressed to toggle pause
+        if (event.keyCode === 80) { // 'P' key
+            togglePause();
+        }
+        return; // Ignore other key presses when paused
+    }
+    if (event.keyCode === 80) { // 'P' for pause
+        togglePause();
+    }
+
+    if (isPaused || !gameActive) {
+        return; // Ignore other keys when paused
+    }
+
+    switch (event.keyCode) {
+        case 37: // Left arrow
+            playerMove(-1);
+            break;
+        case 39: // Right arrow
+            playerMove(1);
+            break;
+        case 38: // Up arrow
+            playerRotate(1);
+            break;
+        case 40: // Down arrow
+            dropInterval = fastDropInterval; // Set for fast drop
+            break;
+        case 32: // Spacebar for hard drop
+            if (!isPaused) {
+                playerHardDrop();
+            }
+            break;
+    }
+});//Controls for key release events
 document.addEventListener('keyup', event => {
     if (event.keyCode === 40) { // Down arrow
         dropInterval = 1000; // Reset to normal drop speed
     }
+});
+// Event Listener for game options buttons
+document.addEventListener('DOMContentLoaded', () => {
+    const startButton = document.getElementById('startButton');
+    const pauseButton = document.getElementById('pauseButton');
+    const resetButton = document.getElementById('resetButton');
+
+    // Event Listener for Start Button
+    startButton.addEventListener('click', () => {
+        if (!gameActive) {
+            gameActive = true;
+            playerReset();
+            update();
+            console.log('Game started');
+        }
+    });
+
+    // Event Listener for Pause Button
+    pauseButton.addEventListener('click', togglePause);
+
+    
+    // Event Listener for Reset Button
+    // Event Listener for Reset Button
+resetButton.addEventListener('click', () => {
+    gameActive = true;  // Ensure the game is set as active
+    isPaused = false;   // Unpause the game if paused
+
+    // Clear the game board
+    arena.forEach(row => row.fill(0));
+
+    // Reset player's score and position
+    player.score = 0;
+    playerReset();  // This will set a new piece and reset the player's position
+
+    updateScore();  // Update the score display
+
+    // Ensure the game loop is running
+    if (!lastTime) { // Check if the game loop is not already running
+        lastTime = performance.now();
+        update(); // Start the game loop
+    }
+
+    console.log('Game reset and started');
+});
 });
 
 playerReset();

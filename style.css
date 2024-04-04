@@ -1,0 +1,11 @@
+canvas {
+    border: 1px solid black;
+    margin: 0 auto;
+    background-color: #000;
+}
+
+.game-options{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
