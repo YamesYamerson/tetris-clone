@@ -9,7 +9,7 @@ function createMatrix(w, h) {
     }
     return matrix;
 }
-
+//Creates the pieces for the game
 function createPiece(type) {
     if (type === 'T') {
         return [
@@ -55,7 +55,7 @@ function createPiece(type) {
         ];
     }
 }
-
+//Checks for collision
 function collide(arena, player) {
     const [m, o] = [player.matrix, player.pos];
     for (let y = 0; y < m.length; ++y) {
@@ -68,7 +68,7 @@ function collide(arena, player) {
     }
     return false;
 }
-
+//Merges the player's piece with the game board
 function merge(arena, player) {
     player.matrix.forEach((row, y) => {
         row.forEach((value, x) => {
@@ -78,7 +78,7 @@ function merge(arena, player) {
         });
     });
 }
-
+//Clears the full lines
 function playerDrop() {
     player.pos.y++;
     if (collide(arena, player)) {
@@ -90,7 +90,7 @@ function playerDrop() {
     }
     dropCounter = 0;
 }
-
+//Resets the player's piece
 function playerReset() {
     const pieces = 'TJLOSZI';
     player.matrix = createPiece(pieces[Math.floor(pieces.length * Math.random())]);
@@ -123,15 +123,14 @@ function rotate(matrix, dir) {
     }
 }
 
-
+// Moves the player's piece left or right
 function playerMove(dir) {
     player.pos.x += dir;
     if (collide(arena, player)) {
         player.pos.x -= dir;
     }
 }
-
-
+// Rotates the player's piece
 function playerRotate(dir) {
     const pos = player.pos.x;
     let offset = 1;
@@ -146,14 +145,14 @@ function playerRotate(dir) {
         }
     }
 }
-
+//Draws the game board and the pieces
 function draw() {
     context.fillStyle = '#000';
     context.fillRect(0, 0, canvas.width, canvas.height);
     drawMatrix(arena, {x: 0, y: 0});
     drawMatrix(player.matrix, player.pos);
 }
-
+//Draws the pieces
 function drawMatrix(matrix, offset) {
     matrix.forEach((row, y) => {
         row.forEach((value, x) => {
@@ -165,10 +164,11 @@ function drawMatrix(matrix, offset) {
     });
 }
 
-let dropCounter = 0;
-let dropInterval = 1000;
-
 let lastTime = 0;
+let dropCounter = 0;
+let dropInterval = 1000; // Normal drop speed in milliseconds
+const fastDropInterval = 50; // Fast drop speed when down arrow is held down
+
 function update(time = 0) {
     const deltaTime = time - lastTime;
     lastTime = time;
@@ -182,6 +182,17 @@ function update(time = 0) {
     requestAnimationFrame(update);
 }
 
+function playerHardDrop() {
+    while (!collide(arena, player)) {
+        player.pos.y++;
+    }
+    player.pos.y--;
+    merge(arena, player);
+    playerReset();
+}
+
+
+// Colors for the pieces
 const colors = [
     null,
     '#FF0D72',
@@ -192,15 +203,14 @@ const colors = [
     '#FFE138',
     '#3877FF',
 ];
-
+//Creates the game board
 const arena = createMatrix(12, 20);
-
 const player = {
     pos: {x: 0, y: 0},
     matrix: null,
     score: 0,
 };
-
+//Controls for key push events
 document.addEventListener('keydown', event => {
     if (event.keyCode === 37) { // Left arrow
         playerMove(-1);
@@ -209,14 +219,17 @@ document.addEventListener('keydown', event => {
     } else if (event.keyCode === 38) { // Up arrow
         playerRotate(1);
     } else if (event.keyCode === 40) { // Down arrow
-        playerRotate(1); // You could use a different rotation direction if you want
-    } else if (event.keyCode === 81) { // Q
-        playerRotate(-1);
-    } else if (event.keyCode === 87) { // W
-        playerRotate(1);
+        dropInterval = 50; // Set for fast drop
+    } else if (event.keyCode === 32) { // Spacebar for hard drop
+        playerHardDrop();
     }
 });
-
+//Controls for key release events
+document.addEventListener('keyup', event => {
+    if (event.keyCode === 40) { // Down arrow
+        dropInterval = 1000; // Reset to normal drop speed
+    }
+});
 
 playerReset();
 update();
