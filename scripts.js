@@ -1,7 +1,13 @@
+// Canvas variable for game board
 const canvas = document.getElementById('tetrisCanvas');
 const context = canvas.getContext('2d');
 context.scale(20, 20); // Make each block 20x20 pixels on the canvas
 let gameActive = false;
+// Canvas variables for held piece
+const holdCanvas = document.getElementById('holdCanvas');
+const holdContext = holdCanvas.getContext('2d');
+holdContext.scale(20, 20); // Adjust scale if necessary
+
 //Create the game board
 function createMatrix(w, h) {
     const matrix = [];
@@ -179,6 +185,7 @@ function playerReset() {
 
 //Resets the player's piece
 function playerReset() {
+    swapped = false; // Reset the swapped flag for the new piece
     const pieces = 'TJLOSZI';
     player.matrix = createPiece(pieces[Math.floor(pieces.length * Math.random())]);
     player.pos.y = 0;
@@ -232,14 +239,28 @@ function playerRotate(dir) {
 }
 //Draws the game board and the pieces
 function draw() {
-    context.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    context.clearRect(0, 0, canvas.width, canvas.height);
     context.fillStyle = '#000';
-    context.fillRect(0, 0, canvas.width, canvas.height); // Draw the game background
-    drawGrid(); // Draw the grid
-    drawShadow(); // Draw the piece shadow with reduced opacity
-    drawMatrix(arena, {x: 0, y: 0}); // Draw the static blocks in the arena
-    drawMatrix(player.matrix, player.pos); // Draw the moving piece
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    drawGrid();
+    drawShadow();
+    drawMatrix(arena, {x: 0, y: 0}, context); // Use main context here
+    drawMatrix(player.matrix, player.pos, context); // Use main context here
+
+    drawHoldPiece(holdPiece); // This will call drawMatrix for the hold canvas
 }
+
+
+//Draws the held piece in a canvas
+function drawHoldPiece(matrix) {
+    holdContext.clearRect(0, 0, holdCanvas.width, holdCanvas.height);
+    if (matrix) {
+        drawMatrix(matrix, { x: 1, y: 1 }, holdContext); // Use hold context here
+    }
+}
+
+
 //Draws a grid on the canvas
 function drawGrid() {
     const gridColor = 'rgba(255, 255, 255, 0.1)'; // Light grid color for subtlety
@@ -274,7 +295,7 @@ function drawShadow() {
     });
 }
 //Draws the pieces
-function drawMatrix(matrix, offset) {
+function drawMatrix(matrix, offset, context) {
     matrix.forEach((row, y) => {
         row.forEach((value, x) => {
             if (value !== 0) {
@@ -286,6 +307,8 @@ function drawMatrix(matrix, offset) {
 }
 
 // Variables for the game loop
+let holdPiece = null;
+let swapped = false;
 let lastTime = 0;
 let dropCounter = 0;
 let dropInterval = 1000; // Normal drop speed in milliseconds
@@ -313,6 +336,29 @@ function update(time = 0) {
     }
     draw();
 }
+}
+
+// Function to hold a piece
+function hold() {
+    if (swapped) return;
+
+    if (!holdPiece) {
+        holdPiece = player.matrix;
+        drawHoldPiece(holdPiece);
+        playerReset();
+    } else {
+        let temp = player.matrix;
+        player.matrix = holdPiece;
+        holdPiece = temp;
+        drawHoldPiece(holdPiece);
+        player.pos.y = 0;
+        player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+        draw(); // Redraw the game to update the piece position immediately
+    }
+    swapped = true;
+}
+
+
 
 // Ensure update is called when unpausing
 if (!isPaused && gameActive) {
@@ -368,6 +414,10 @@ document.addEventListener('keydown', event => {
 
     if (isPaused || !gameActive) {
         return; // Ignore other keys when paused
+    }
+
+    if (event.keyCode === 67) { // 'C' for hold
+        hold();
     }
 
     switch (event.keyCode) {
@@ -428,10 +478,8 @@ resetButton.addEventListener('click', () => {
         lastTime = performance.now();
         update(); // Start the game loop
     }
-
     console.log('Game reset and started');
 });
 });
-
 playerReset();
 update();
