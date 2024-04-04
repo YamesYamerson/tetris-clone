@@ -130,7 +130,6 @@ function arenaSweep() {
         console.log(`Cleared ${rowCount} rows, score: ${player.score}`);
     }
 }
-
 function playerDrop() {
     console.log("Player dropped");
     player.pos.y++;
@@ -162,6 +161,7 @@ function togglePause() {
     document.getElementById('pauseButton').textContent = isPaused ? 'Resume Game' : 'Pause Game';
 }
 //Resets the player's piece
+
 
 function playerReset() {
     console.log("Resetting player");
@@ -297,6 +297,13 @@ function update(time = 0) {
     if (!gameActive || isPaused) {
         return; // Skip game logic if the game is not active or is paused
     }
+function update(time = 0) {
+    requestAnimationFrame(update); // Always request the next frame
+
+    if (!gameActive || isPaused) {
+        return; // Skip game logic if the game is not active or is paused
+    }
+
     const deltaTime = time - lastTime;
     lastTime = time;
     dropCounter += deltaTime;
