@@ -78,18 +78,63 @@ function merge(arena, player) {
         });
     });
 }
-//Clears the full lines
+//Checks for full lines and clears them, also shifts arena down
+function arenaSweep() {
+    let rowCount = 0;
+    outer: for (let y = arena.length - 1; y >= 0; --y) {
+        for (let x = 0; x < arena[y].length; ++x) {
+            if (arena[y][x] === 0) {
+                console.log(`Row ${y} is not full.`);
+                continue outer;
+            }
+        }
+
+        console.log(`Clearing full row ${y}`);
+        const row = arena.splice(y, 1)[0].fill(0);
+        arena.unshift(row);
+        ++y;
+
+        rowCount++;
+    }
+
+    if (rowCount > 0) {
+        player.score += rowCount * 10;
+        updateScore();
+        console.log(`Cleared ${rowCount} rows, score: ${player.score}`);
+    }
+}
+
 function playerDrop() {
+    console.log("Player dropped");
     player.pos.y++;
     if (collide(arena, player)) {
+        console.log("Collision detected");
         player.pos.y--; // Move the piece back up
         merge(arena, player); // Merge it with the arena
+        console.log("Before arenaSweep");
+        arenaSweep(); // Check and clear any full lines
+        console.log("After arenaSweep");
         playerReset(); // Reset the player's piece
-        // arenaSweep(); // We will implement this later to clear full lines
-        updateScore(); // We will also implement this later
+        updateScore(); // Update the score
     }
     dropCounter = 0;
 }
+
+function playerReset() {
+    console.log("Resetting player");
+    const pieces = 'TJLOSZI';
+    player.matrix = createPiece(pieces[Math.floor(pieces.length * Math.random())]);
+    player.pos.y = 0;
+    player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+    if (collide(arena, player)) {
+        console.log("Game over detected");
+        arena.forEach(row => row.fill(0));
+        player.score = 0;
+        updateScore();
+    }
+}
+
+
 //Resets the player's piece
 function playerReset() {
     const pieces = 'TJLOSZI';
@@ -178,8 +223,6 @@ function drawShadow() {
         shadow.pos.y++;
     }
     shadow.pos.y--; // Move back to the last non-colliding position
-
-    // Reduced alpha value for a very subtle shadow
     context.fillStyle = 'rgba(255, 255, 255, 0.1)';
     shadow.matrix.forEach((row, y) => {
         row.forEach((value, x) => {
@@ -190,9 +233,6 @@ function drawShadow() {
         });
     });
 }
-
-
-
 //Draws the pieces
 function drawMatrix(matrix, offset) {
     matrix.forEach((row, y) => {
@@ -205,33 +245,33 @@ function drawMatrix(matrix, offset) {
     });
 }
 
+// Variables for the game loop
 let lastTime = 0;
 let dropCounter = 0;
 let dropInterval = 1000; // Normal drop speed in milliseconds
 const fastDropInterval = 50; // Fast drop speed when down arrow is held down
-
+// Updates the game
 function update(time = 0) {
     const deltaTime = time - lastTime;
     lastTime = time;
-
     dropCounter += deltaTime;
     if (dropCounter > dropInterval) {
         playerDrop();
     }
-
     draw();
     requestAnimationFrame(update);
 }
-
+// Function to hard drop the player's piece
 function playerHardDrop() {
     while (!collide(arena, player)) {
         player.pos.y++;
     }
-    player.pos.y--;
-    merge(arena, player);
-    playerReset();
+    player.pos.y--; // Move the piece back up to the last valid position
+    merge(arena, player); // Merge it with the arena
+    arenaSweep(); // Check and clear any full lines
+    playerReset(); // Reset the player's piece
+    updateScore(); // Update the score
 }
-
 
 // Colors for the pieces
 const colors = [
