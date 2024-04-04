@@ -283,13 +283,6 @@ function drawHoldPiece(matrix) {
     }
 }
 
-
-
-
-
-
-
-
 //Draws a grid on the canvas
 function drawGrid() {
     const gridColor = 'rgba(255, 255, 255, 0.1)'; // Light grid color for subtlety

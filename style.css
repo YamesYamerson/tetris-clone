@@ -1,4 +1,4 @@
-body {
+ body {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -10,17 +10,37 @@ body {
     justify-content: space-between;
     width: 240px; /* Match the width of the Tetris canvas */
     align-items: center; /* Align items vertically */
+    padding: 10px;
 }
-#holdPiece {
-    width: 40px; /* Reduced width for the hold canvas */
-    height: 40px; /* Reduced height for the hold canvas */
+.option-button{
+    width: 100px;
+    height: 40px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#game-outer-frame {
     background-color: #333; /* Dark grey background */
     border: 2px solid black; /* Black outline */
+    padding: 20px;
+}
+#holdPiece {
+    width: 80px; /* Container width */
+    height: 80px; /* Container height */
+    background-color: #333; /* Dark grey background */
+    border: 2px solid black; /* Black outline */
+    display: flex;
     justify-content: center;
     align-items: center;
 }
 #holdCanvas {
-    width: 100%;
-    height: 100%;
+    /* Set to the actual pixel dimensions you need for the tetrominoes */
+    /* Don't use width and height here to avoid scaling */
     background-color: #333;
+}
+#score-line{
+    font-weight: bold;
 }

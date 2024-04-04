@@ -3,50 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <title>Tetris Clone</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 0;
-            padding: 10px;
-        }
-        .top-container {
-            display: flex;
-            justify-content: space-between;
-            width: 240px; /* Match the width of the Tetris canvas */
-            align-items: center; /* Align items vertically */
-        }
-        #holdPiece {
-            width: 80px; /* Container width */
-            height: 80px; /* Container height */
-            background-color: #333; /* Dark grey background */
-            border: 2px solid black; /* Black outline */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        #holdCanvas {
-            /* Set to the actual pixel dimensions you need for the tetrominoes */
-            /* Don't use width and height here to avoid scaling */
-            background-color: #333;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="game-options">
-        <button id="startButton">Start Game</button>
-        <button id="pauseButton">Pause Game</button>
-        <button id="resetButton">Reset Game</button>
-    </div>
-    <div class="top-container">
-        <div id="holdPiece">
-            <!-- Set the canvas size to match the scale of the tetrominoes -->
-            <canvas id="holdCanvas" width="80" height="80"></canvas>
+    <div id="game-outer-frame">
+        <div class="game-options">
+            <button id="startButton" class="option-button">Start Game</button>
+            <button id="pauseButton" class="option-button">Pause Game</button>
+            <button id="resetButton" class="option-button">Reset Game</button>
         </div>
-        <p>Score: <span id="score">0</span></p>
+        <div class="top-container">
+            <div id="holdPiece">
+                <!-- Set the canvas size to match the scale of the tetrominoes -->
+                <canvas id="holdCanvas" width="80" height="80"></canvas>
+            </div>
+            <p id="score-line">Score: <span id="score">0</span></p>
+        </div>
+        <canvas id="tetrisCanvas" width="240" height="400"></canvas>
     </div>
-    <canvas id="tetrisCanvas" width="240" height="400"></canvas>
     <script src="scripts.js"></script>
 </body>
 </html>
