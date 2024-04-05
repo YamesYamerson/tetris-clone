@@ -55,10 +55,57 @@ const insults = [
 
 // Canvas variable for game board
 const canvas = document.getElementById('tetrisCanvas');
-// Initializes touch events for mobile devices
-gameCanvas.addEventListener('touchstart', handleTouchStart, false);
-gameCanvas.addEventListener('touchmove', handleTouchMove, false);
-gameCanvas.addEventListener('touchend', handleTouchEnd, false);
+canvas.addEventListener('touchstart', handleTouchStart, false);
+canvas.addEventListener('touchmove', handleTouchMove, false);
+canvas.addEventListener('touchend', handleTouchEnd, false);
+
+let touchStartX = 0;
+let touchStartY = 0;
+let touchEndX = 0;
+let touchEndY = 0;
+
+function handleTouchStart(event) {
+    // Starting points of the touch
+    touchStartX = event.touches[0].clientX;
+    touchStartY = event.touches[0].clientY;
+}
+
+function handleTouchMove(event) {
+    // Update the end points of the touch
+    touchEndX = event.touches[0].clientX;
+    touchEndY = event.touches[0].clientY;
+}
+
+function handleTouchEnd(event) {
+    const dx = touchEndX - touchStartX;
+    const dy = touchEndY - touchStartY;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+    const swipeThreshold = 20; // Minimum distance for a swipe to be recognized
+
+    if (absDx > swipeThreshold || absDy > swipeThreshold) {
+        // A swipe was detected
+        event.preventDefault(); // Prevent scrolling and other default actions only if a swipe is detected
+
+        if (absDx > absDy) {
+            // Horizontal swipe
+            if (dx > 0) {
+                playerMove(1);  // Move right
+            } else {
+                playerMove(-1);  // Move left
+            }
+        } else {
+            // Vertical swipe
+            if (dy > 0) {
+                playerDrop();  // Move down or fast drop
+            } else {
+                playerRotate(1);  // Rotate piece
+            }
+        }
+    }
+}
+
+
 const context = canvas.getContext('2d');
 context.scale(20, 20); // Make each block 20x20 pixels on the canvas
 let gameActive = false;
@@ -603,54 +650,5 @@ resetButton.addEventListener('click', () => {
     console.log('Game reset and started');
 });
 });
-// Touch Commands
-
-let touchStartX = 0;
-let touchStartY = 0;
-let touchEndX = 0;
-let touchEndY = 0;
-
-function handleTouchStart(event) {
-    const touch = event.touches[0];
-    touchStartX = touch.clientX;
-    touchStartY = touch.clientY;
-}
-
-function handleTouchMove(event) {
-    event.preventDefault(); // Prevent scrolling and other default actions
-    const touch = event.touches[0];
-    touchEndX = touch.clientX;
-    touchEndY = touch.clientY;
-}
-
-function handleTouchEnd(event) {
-    const dx = touchEndX - touchStartX;
-    const dy = touchEndY - touchStartY;
-    const absDx = Math.abs(dx);
-    const absDy = Math.abs(dy);
-
-    if (absDx > absDy) {
-        // Horizontal movement
-        if (dx > 0) {
-            console.log('Swiped right');
-            // Move piece right or other action
-        } else {
-            console.log('Swiped left');
-            // Move piece left or other action
-        }
-    } else {
-        // Vertical movement
-        if (dy > 0) {
-            console.log('Swiped down');
-            // Move piece down or other action
-        } else {
-            console.log('Swiped up');
-            // Rotate piece or other action
-        }
-    }
-}
-
-
-
 playerReset();
 update();
