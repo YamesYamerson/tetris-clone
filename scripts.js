@@ -283,13 +283,6 @@ function drawHoldPiece(matrix) {
     }
 }
 
-
-
-
-
-
-
-
 //Draws a grid on the canvas
 function drawGrid() {
     const gridColor = 'rgba(255, 255, 255, 0.1)'; // Light grid color for subtlety
@@ -381,7 +374,7 @@ function hold() {
         holdPiece = temp;
         drawHoldPiece(holdPiece);
         player.pos.y = 0;
-        player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+        player.pos.x = (arena[0].length / 4 | 0) - (player.matrix[0].length / 2 | 0);
         draw(); // Redraw the game to update the piece position immediately
     }
     swapped = true;
