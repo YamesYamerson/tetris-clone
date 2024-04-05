@@ -374,7 +374,7 @@ function hold() {
         holdPiece = temp;
         drawHoldPiece(holdPiece);
         player.pos.y = 0;
-        player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+        player.pos.x = (arena[0].length / 4 | 0) - (player.matrix[0].length / 2 | 0);
         draw(); // Redraw the game to update the piece position immediately
     }
     swapped = true;
