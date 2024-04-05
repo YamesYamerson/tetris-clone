@@ -13,7 +13,6 @@
     justify-content: space-between;
     width: 240px; /* Match the width of the Tetris canvas */
     align-items: center; /* Align items vertically */
-    padding: 10px;
 }
 .option-button{
     font-family: 'VT323';
@@ -36,7 +35,7 @@
     background-color: #333;
     color: white;
     border-radius: 5px;
-    padding: 20px;
+    padding: 10px;
 }
 
 #gameTitle {
