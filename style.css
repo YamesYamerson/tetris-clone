@@ -56,6 +56,7 @@
     /* Set to the actual pixel dimensions you need for the tetrominoes */
     /* Don't use width and height here to avoid scaling */
     background-color: black;
+    border-radius: 5px;
 }
 #score-line{
     font-weight: bold;

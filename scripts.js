@@ -236,7 +236,7 @@ function playerReset() {
         const insult = insults[Math.floor(Math.random() * insults.length)];
         document.getElementById('gameOverOverlay').innerHTML = `
             <div class="overlay-content">
-                <p>Game Over! ${insult}</p>
+                <p>${insult}</p>
                 <button id="restartButton">Restart</button>
             </div>
         `;
