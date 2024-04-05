@@ -65,15 +65,15 @@ let touchEndX = 0;
 let touchEndY = 0;
 
 function handleTouchStart(event) {
+    // Starting points of the touch
     touchStartX = event.touches[0].clientX;
     touchStartY = event.touches[0].clientY;
-    event.preventDefault();  // Prevent default touch actions like scroll
 }
 
 function handleTouchMove(event) {
+    // Update the end points of the touch
     touchEndX = event.touches[0].clientX;
     touchEndY = event.touches[0].clientY;
-    event.preventDefault();  // It's important to prevent default actions here as well
 }
 
 function handleTouchEnd(event) {
@@ -81,8 +81,12 @@ function handleTouchEnd(event) {
     const dy = touchEndY - touchStartY;
     const absDx = Math.abs(dx);
     const absDy = Math.abs(dy);
+    const swipeThreshold = 20; // Minimum distance for a swipe to be recognized
 
-    if (absDx > 20 || absDy > 20) {  // Adding a threshold to detect swipe
+    if (absDx > swipeThreshold || absDy > swipeThreshold) {
+        // A swipe was detected
+        event.preventDefault(); // Prevent scrolling and other default actions only if a swipe is detected
+
         if (absDx > absDy) {
             // Horizontal swipe
             if (dx > 0) {
@@ -93,14 +97,14 @@ function handleTouchEnd(event) {
         } else {
             // Vertical swipe
             if (dy > 0) {
-                playerDrop();  // Move down (fast drop)
+                playerDrop();  // Move down or fast drop
             } else {
                 playerRotate(1);  // Rotate piece
             }
         }
     }
-    event.preventDefault();
 }
+
 
 const context = canvas.getContext('2d');
 context.scale(20, 20); // Make each block 20x20 pixels on the canvas
