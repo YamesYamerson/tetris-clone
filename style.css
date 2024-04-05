@@ -18,7 +18,7 @@
 .option-button{
     font-family: 'VT323';
     width: 100px;
-    height: 40px;
+    height: 35px;
     background-color: rgb(120, 120, 112);
     color: white;
     border: round;
@@ -37,6 +37,11 @@
     color: white;
     border-radius: 5px;
     padding: 20px;
+}
+
+#gameTitle {
+    padding: 0px;
+    margin: 0px;
 }
 
 #holdPiece {
