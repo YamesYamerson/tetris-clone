@@ -1,3 +1,9 @@
+// Constants for the canvas and scaling
+const tetrisCanvas = document.getElementById('tetrisCanvas');
+let tetrisCtx = tetrisCanvas.getContext('2d');
+const originalTetrisWidth = 320; // Adjust to your Tetris game's original width
+const originalTetrisHeight = 640; // Adjust to your Tetris game's original height
+
 const insults = [
     "Is that really your best effort?",
     // ... other insults ...
@@ -14,6 +20,25 @@ let touchStartX = 0;
 let touchStartY = 0;
 let touchEndX = 0;
 let touchEndY = 0;
+
+
+
+function drawMatrix(matrix, offset) {
+    matrix.forEach((row, y) => {
+        row.forEach((value, x) => {
+            if (value !== 0) {
+                tetrisCtx.fillStyle = colors[value];
+                tetrisCtx.fillRect(
+                    (x + offset.x) * scaleFactorX,
+                    (y + offset.y) * scaleFactorY,
+                    1 * scaleFactorX,
+                    1 * scaleFactorY
+                );
+            }
+        });
+    });
+}
+
 
 function handleTouchStart(event) {
     // Starting points of the touch
@@ -367,7 +392,10 @@ function drawShadow() {
         });
     });
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 771e43a4c49fc1d97cab22a84530cbb91064b71c
 // Draws the pieces
 function drawMatrix(matrix, offset, context) {
     matrix.forEach((row, y) => {
@@ -557,6 +585,10 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Game reset and started');
     });
 });
+<<<<<<< HEAD
 
+=======
+window.addEventListener('resize', resizeTetrisCanvas);
+>>>>>>> 771e43a4c49fc1d97cab22a84530cbb91064b71c
 playerReset();
 update();
