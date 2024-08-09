@@ -1,9 +1,3 @@
-// Constants for the canvas and scaling
-const tetrisCanvas = document.getElementById('tetrisCanvas');
-let tetrisCtx = tetrisCanvas.getContext('2d');
-const originalTetrisWidth = 320; // Adjust to your Tetris game's original width
-const originalTetrisHeight = 640; // Adjust to your Tetris game's original height
-
 const insults = [
     "Is that really your best effort?",
     // ... other insults ...
@@ -20,25 +14,6 @@ let touchStartX = 0;
 let touchStartY = 0;
 let touchEndX = 0;
 let touchEndY = 0;
-
-
-
-function drawMatrix(matrix, offset) {
-    matrix.forEach((row, y) => {
-        row.forEach((value, x) => {
-            if (value !== 0) {
-                tetrisCtx.fillStyle = colors[value];
-                tetrisCtx.fillRect(
-                    (x + offset.x) * scaleFactorX,
-                    (y + offset.y) * scaleFactorY,
-                    1 * scaleFactorX,
-                    1 * scaleFactorY
-                );
-            }
-        });
-    });
-}
-
 
 function handleTouchStart(event) {
     // Starting points of the touch
@@ -213,7 +188,7 @@ function togglePause() {
     document.getElementById('pauseButton').textContent = isPaused ? 'Resume Game' : 'Pause Game';
 }
 
-// Function to reset the player's piece
+// Resets the player's piece
 function playerReset() {
     const pieces = 'TJLOSZI';
     player.matrix = createPiece(pieces[Math.floor(Math.random() * pieces.length)]);
@@ -226,16 +201,20 @@ function playerReset() {
         updateScore();
         gameActive = false;
 
-        // Display the game over screen with a random insult
+        // Get a random insult
         const insult = insults[Math.floor(Math.random() * insults.length)];
+        const gameOverText = `Game Over! ${insult}`;
+        
+        // Update the overlay content dynamically
         document.getElementById('gameOverOverlay').innerHTML = `
             <div class="overlay-content">
-                <p>Game Over! ${insult}</p>
+                <p>${gameOverText}</p>
                 <button id="restartButton">Restart</button>
             </div>
         `;
         document.getElementById('gameOverOverlay').style.display = 'flex';
 
+        // Add event listener to the restart button inside the overlay
         document.getElementById('restartButton').addEventListener('click', () => {
             document.getElementById('gameOverOverlay').style.display = 'none';
             gameActive = true;
@@ -295,8 +274,6 @@ function playerRotate(dir) {
     console.log('Rotation successful, new position', player.pos.x);
 }
 
-
-
 // Draws the game board and the pieces
 function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -311,12 +288,12 @@ function draw() {
     drawHoldPiece(holdPiece); // This will call drawMatrix for the hold canvas
 }
 
-// Function to draw the held piece on the hold canvas
+// Draws the held piece in a canvas
 function drawHoldPiece(matrix) {
     holdContext.clearRect(0, 0, holdCanvas.width, holdCanvas.height);
 
     if (matrix) {
-        console.log("Drawing held piece:", matrix);
+        console.log("Drawing held piece on hold canvas:", matrix);
         // Calculate the bounding box of the tetrimino
         let minX = matrix[0].length, maxX = 0, minY = matrix.length, maxY = 0;
         for (let y = 0; y < matrix.length; y++) {
@@ -341,21 +318,6 @@ function drawHoldPiece(matrix) {
         // Adjust the position to start drawing from the top-left of the bounding box
         drawMatrix(matrix, { x: offsetX - minX, y: offsetY - minY }, holdContext);
     }
-}
-
-// Example of how to debug the playerDrop function
-function playerDrop() {
-    player.pos.y++;
-    if (collide(arena, player)) {
-        player.pos.y--; // Move the piece back to the last valid position
-        merge(arena, player); // Merge it with the arena
-        playerReset(); // Reset the player's piece after it has landed
-        arenaSweep(); // Check and clear any full lines
-        updateScore(); // Update the score
-        swapped = false; // Reset the swapped flag after dropping
-        console.log("Player piece dropped. Resetting swapped flag.");
-    }
-    dropCounter = 0; // Reset the drop counter
 }
 
 // Draws a grid on the canvas
@@ -392,10 +354,7 @@ function drawShadow() {
         });
     });
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> 771e43a4c49fc1d97cab22a84530cbb91064b71c
 // Draws the pieces
 function drawMatrix(matrix, offset, context) {
     matrix.forEach((row, y) => {
@@ -434,7 +393,6 @@ function update(time = 0) {
 }
 
 // Function to hold a piece
-// Function to hold a piece
 function hold() {
     if (swapped) {
         console.log("Can't swap again until the next piece!");
@@ -461,6 +419,22 @@ function hold() {
     console.log("Held piece after swap/hold:", holdPiece);
 }
 
+// Function to drop the player's piece by one row
+function playerDrop() {
+    player.pos.y++;
+    if (collide(arena, player)) {
+        player.pos.y--; // Move the piece back to the last valid position
+        merge(arena, player); // Merge it with the arena
+        playerReset(); // Reset the player's piece after it has landed
+        swapped = false; // Reset the swapped flag after dropping
+        arenaSweep(); // Check and clear any full lines
+        updateScore(); // Update the score
+        console.log("Player piece dropped. Swapped flag reset.");
+    }
+    dropCounter = 0; // Reset the drop counter
+}
+
+
 // Function to hard drop the player's piece
 function playerHardDrop() {
     while (!collide(arena, player)) {
@@ -468,7 +442,7 @@ function playerHardDrop() {
     }
     player.pos.y--; // Move the piece back up to the last valid position
     merge(arena, player); // Merge it with the arena
-    playerReset(); // Reset the player's piece after it has landed
+    playerReset(); // Reset the player's piece
     swapped = false; // Reset the swapped flag after hard dropping
     arenaSweep(); // Check and clear any full lines
     updateScore(); // Update the score
@@ -585,10 +559,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Game reset and started');
     });
 });
-<<<<<<< HEAD
 
-=======
-window.addEventListener('resize', resizeTetrisCanvas);
->>>>>>> 771e43a4c49fc1d97cab22a84530cbb91064b71c
 playerReset();
 update();
