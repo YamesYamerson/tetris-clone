@@ -560,5 +560,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+function resizeCanvas() {
+    const container = document.getElementById('game-canvas-container');
+    const rect = container.getBoundingClientRect();
+    let availableHeight = rect.height;
+    let availableWidth = rect.width;
+
+    // Set height to max possible, width to maintain 1:2 aspect ratio
+    let height = availableHeight;
+    let width = height * 0.5;
+
+    // If width would overflow, adjust height instead
+    if (width > availableWidth) {
+        width = availableWidth;
+        height = width * 2;
+    }
+
+    // Set canvas size
+    canvas.width = width;
+    canvas.height = height;
+    canvas.style.display = 'block';
+    canvas.style.margin = '0 auto';
+
+    // Scale context so 10x20 grid fits
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.scale(width / 10, height / 20);
+
+    // Hold canvas (keep at 80x80 for now)
+    holdCanvas.width = 80;
+    holdCanvas.height = 80;
+    holdContext.setTransform(1, 0, 0, 1, 0, 0);
+    holdContext.scale(20, 20);
+
+    if (gameActive) {
+        draw();
+    }
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
 playerReset();
 update();
