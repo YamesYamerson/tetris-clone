@@ -43,6 +43,11 @@ body {
     cursor: pointer;
     font-weight: bold;
     font-size: 1.2rem;
+    transition: background-color 0.2s ease;
+}
+
+.option-button:hover {
+    background-color: rgb(150, 150, 142);
 }
 
 #game-outer-frame {
@@ -170,6 +175,11 @@ body {
     cursor: pointer;
     font-weight: bold;
     font-size: 1.2rem;
+    transition: background-color 0.2s ease;
+}
+
+#restartButton:hover {
+    background-color: rgb(150, 150, 142);
 }
 
 #scoreboard {
