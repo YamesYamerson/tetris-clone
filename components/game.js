@@ -19,6 +19,7 @@ export const gameState = {
     playerDrop,
     playerHardDrop,
     hold,
+    holdPiece: null,
     update: null // Will be set after initialization
 };
 
@@ -26,6 +27,10 @@ export const gameState = {
 function update(time = 0) {
     requestAnimationFrame(update);
 
+    // Always draw the game board, even when not active
+    draw(gameState.arena, gameState.player, gameState.holdPiece);
+
+    // Only update game logic if active and not paused
     if (!gameState.gameActive || gameState.isPaused) {
         return;
     }
@@ -35,11 +40,9 @@ function update(time = 0) {
     gameState.dropCounter += deltaTime;
 
     if (gameState.dropCounter > gameState.dropInterval) {
-        gameState.playerDrop(gameState.arena);
+        gameState.holdPiece = gameState.playerDrop(gameState.arena, gameState);
         gameState.dropCounter = 0;
     }
-
-    draw(gameState.arena, gameState.player, gameState.holdPiece);
 }
 
 // Sets up keyboard controls
@@ -86,7 +89,7 @@ function setupKeyboardControls() {
                 break;
             case 32: // Spacebar for hard drop
                 if (!gameState.isPaused) {
-                    gameState.holdPiece = gameState.playerHardDrop(gameState.arena);
+                    gameState.holdPiece = gameState.playerHardDrop(gameState.arena, gameState);
                 }
                 break;
         }
@@ -110,6 +113,6 @@ export function initGame() {
     setupUI(gameState, gameState.arena);
 
     // Initial game setup
-    gameState.playerReset(gameState.arena);
+    gameState.holdPiece = gameState.playerReset(gameState.arena, gameState);
     update();
 } 

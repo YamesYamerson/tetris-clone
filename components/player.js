@@ -20,6 +20,7 @@ export function playerReset(arena, gameState) {
     player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
 
     if (collide(arena, player)) {
+        // Game over condition
         arena.forEach(row => row.fill(0));
         // Store the score and update scoreboard
         updateScoreboard(player.score);
@@ -32,21 +33,32 @@ export function playerReset(arena, gameState) {
         const gameOverText = `Game Over! ${insult}`;
         
         // Update the overlay content dynamically
-        document.getElementById('gameOverOverlay').innerHTML = `
+        const overlay = document.getElementById('gameOverOverlay');
+        overlay.innerHTML = `
             <div class="overlay-content">
                 <p>${gameOverText}</p>
                 <button id="restartButton">Restart</button>
             </div>
         `;
-        document.getElementById('gameOverOverlay').style.display = 'flex';
+        overlay.style.display = 'flex';
 
-        // Add event listener to the restart button inside the overlay
+        // Remove any existing event listeners
+        const oldButton = document.getElementById('restartButton');
+        if (oldButton) {
+            oldButton.replaceWith(oldButton.cloneNode(true));
+        }
+
+        // Add event listener to the new restart button
         document.getElementById('restartButton').addEventListener('click', () => {
-            document.getElementById('gameOverOverlay').style.display = 'none';
+            overlay.style.display = 'none';
             gameState.gameActive = true;
-            playerReset(arena, gameState);
+            gameState.isPaused = false;
+            gameState.playerReset(arena, gameState);
             gameState.update();
         });
+
+        // Return early to prevent further execution
+        return holdPiece;
     }
 
     swapped = false;

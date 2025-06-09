@@ -28,16 +28,23 @@ export let touchEndY = 0;
 
 // Draws the game board and the pieces
 export function draw(arena, player, holdPiece) {
+    // Always draw black background and grid
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.fillStyle = '#000';
     context.fillRect(0, 0, canvas.width, canvas.height);
-
     drawGrid();
-    drawShadow(arena, player);
-    drawMatrix(arena, {x: 0, y: 0}, context);
-    drawMatrix(player.matrix, player.pos, context);
 
-    drawHoldPiece(holdPiece);
+    // Only draw game elements if we have a player and arena
+    if (player && player.matrix) {
+        drawShadow(arena, player);
+        drawMatrix(arena, {x: 0, y: 0}, context);
+        drawMatrix(player.matrix, player.pos, context);
+    }
+
+    // Always draw the hold piece if it exists
+    if (holdPiece) {
+        drawHoldPiece(holdPiece);
+    }
 }
 
 // Draws the grid on the canvas

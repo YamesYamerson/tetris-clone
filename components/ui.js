@@ -1,5 +1,7 @@
 // UI-related functions
 
+import { updateScoreboard } from './scoreboard.js';
+
 // Scoreboard state
 const scores = [];
 
@@ -22,83 +24,138 @@ export function updateScoreboard(score) {
     });
 }
 
-// Sets up UI event listeners
+// Sets up UI controls
 export function setupUI(gameState, arena) {
     const startButton = document.getElementById('startButton');
     const pauseButton = document.getElementById('pauseButton');
     const resetButton = document.getElementById('resetButton');
+    const overlay = document.getElementById('gameOverOverlay');
 
-    // Event Listener for Start Button
     startButton.addEventListener('click', () => {
         if (!gameState.gameActive) {
             gameState.gameActive = true;
-            gameState.lastTime = 0;
-            gameState.playerReset(arena);
-            gameState.update();
+            gameState.isPaused = false;
+            gameState.arena.forEach(row => row.fill(0));
+            gameState.player.score = 0;
+            updateScore(gameState.player.score);
+            gameState.holdPiece = gameState.playerReset(arena, gameState);
+            startButton.textContent = 'Restart';
+            pauseButton.textContent = 'Pause';
+            overlay.style.display = 'none';
+        } else {
+            // Restart the game
+            gameState.gameActive = true;
+            gameState.isPaused = false;
+            gameState.arena.forEach(row => row.fill(0));
+            gameState.player.score = 0;
+            updateScore(gameState.player.score);
+            gameState.holdPiece = gameState.playerReset(arena, gameState);
+            overlay.style.display = 'none';
         }
     });
 
-    // Event Listener for Pause Button
     pauseButton.addEventListener('click', () => {
-        if (!gameState.gameActive) return;
-        gameState.isPaused = !gameState.isPaused;
-        pauseButton.textContent = gameState.isPaused ? 'Resume' : 'Pause';
+        if (gameState.gameActive) {
+            gameState.isPaused = !gameState.isPaused;
+            pauseButton.textContent = gameState.isPaused ? 'Resume' : 'Pause';
+        }
     });
 
-    // Event Listener for Reset Button
     resetButton.addEventListener('click', () => {
-        gameState.gameActive = true;
+        gameState.gameActive = false;
         gameState.isPaused = false;
-
-        arena.forEach(row => row.fill(0));
+        gameState.arena.forEach(row => row.fill(0));
         gameState.player.score = 0;
-        gameState.playerReset(arena);
         updateScore(gameState.player.score);
-        
-        gameState.lastTime = 0;
-        gameState.update();
+        gameState.holdPiece = gameState.playerReset(arena, gameState);
+        startButton.textContent = 'Start';
+        pauseButton.textContent = 'Pause';
+        overlay.style.display = 'none';
     });
 }
 
 // Sets up touch controls
 export function setupTouchControls(canvas, gameState, arena) {
-    canvas.addEventListener('touchstart', handleTouchStart, false);
-    canvas.addEventListener('touchmove', handleTouchMove, false);
-    canvas.addEventListener('touchend', handleTouchEnd, false);
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+    let touchStartTime = 0;
+    let touchEndTime = 0;
+    let isSwiping = false;
+    let swipeTimeout = null;
 
-    function handleTouchStart(event) {
-        touchStartX = event.touches[0].clientX;
-        touchStartY = event.touches[0].clientY;
-    }
+    canvas.addEventListener('touchstart', (e) => {
+        if (!gameState.gameActive || gameState.isPaused) return;
+        
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchStartTime = Date.now();
+        isSwiping = true;
 
-    function handleTouchMove(event) {
-        touchEndX = event.touches[0].clientX;
-        touchEndY = event.touches[0].clientY;
-    }
+        // Clear any existing swipe timeout
+        if (swipeTimeout) {
+            clearTimeout(swipeTimeout);
+        }
 
-    function handleTouchEnd(event) {
-        const dx = touchEndX - touchStartX;
-        const dy = touchEndY - touchStartY;
-        const absDx = Math.abs(dx);
-        const absDy = Math.abs(dy);
-        const swipeThreshold = 20;
+        // Set a timeout to detect taps
+        swipeTimeout = setTimeout(() => {
+            if (isSwiping) {
+                gameState.holdPiece = gameState.hold(arena);
+                isSwiping = false;
+            }
+        }, 200);
+    }, { passive: false });
 
-        if (absDx > swipeThreshold || absDy > swipeThreshold) {
-            event.preventDefault();
+    canvas.addEventListener('touchmove', (e) => {
+        if (!gameState.gameActive || gameState.isPaused || !isSwiping) return;
+        
+        e.preventDefault();
+        touchEndX = e.touches[0].clientX;
+        touchEndY = e.touches[0].clientY;
 
-            if (absDx > absDy) {
-                if (dx > 0) {
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = touchEndY - touchStartY;
+        const deltaTime = Date.now() - touchStartTime;
+
+        // If we've moved enough to be a swipe
+        if (Math.abs(deltaX) > 30 || Math.abs(deltaY) > 30) {
+            isSwiping = false;
+            if (swipeTimeout) {
+                clearTimeout(swipeTimeout);
+            }
+
+            // Determine if it's a horizontal or vertical swipe
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                // Horizontal swipe
+                if (deltaX > 0) {
                     gameState.playerMove(1, arena);
                 } else {
                     gameState.playerMove(-1, arena);
                 }
             } else {
-                if (dy > 0) {
-                    gameState.playerDrop(arena);
+                // Vertical swipe
+                if (deltaY > 0) {
+                    // Down swipe - hard drop
+                    gameState.holdPiece = gameState.playerHardDrop(arena, gameState);
                 } else {
+                    // Up swipe - rotate
                     gameState.playerRotate(1, arena);
                 }
             }
+
+            // Reset touch positions for next swipe
+            touchStartX = touchEndX;
+            touchStartY = touchEndY;
+            touchStartTime = Date.now();
+            isSwiping = true;
         }
-    }
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', () => {
+        isSwiping = false;
+        if (swipeTimeout) {
+            clearTimeout(swipeTimeout);
+        }
+    }, { passive: false });
 } 
