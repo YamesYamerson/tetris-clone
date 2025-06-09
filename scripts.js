@@ -193,7 +193,7 @@ function togglePause() {
     if (!gameActive) return; // Only toggle pause if the game is active
     isPaused = !isPaused;
     console.log(isPaused ? 'Game paused' : 'Game resumed');
-    document.getElementById('pauseButton').textContent = isPaused ? 'Resume Game' : 'Pause Game';
+    document.getElementById('pauseButton').textContent = isPaused ? 'Resume' : 'Pause';
 }
 
 // Scoreboard logic
@@ -585,33 +585,28 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function resizeCanvas() {
-    const container = document.getElementById('game-canvas-container');
+    const container = document.getElementById('center-col'); // Use center-col for sizing
     const rect = container.getBoundingClientRect();
     let availableHeight = rect.height;
     let availableWidth = rect.width;
 
-    // Maintain 10:20 aspect ratio and square cells
-    let width, height, cellSize;
-    if (availableWidth / 10 < availableHeight / 20) {
-        // Width is the limiting factor
+    // For 10:20 aspect ratio, height should be at most availableHeight,
+    // width should be at most availableWidth, but width = height * 0.5
+    let height = Math.min(availableHeight, availableWidth * 2);
+    let width = height * 0.5;
+
+    // If width is the limiting factor, recalculate height
+    if (width > availableWidth) {
         width = availableWidth;
-        cellSize = width / 10;
-        height = cellSize * 20;
-    } else {
-        // Height is the limiting factor
-        height = availableHeight;
-        cellSize = height / 20;
-        width = cellSize * 10;
+        height = width * 2;
     }
 
     canvas.width = width;
     canvas.height = height;
     canvas.style.display = 'block';
-    canvas.style.margin = '0 auto'; // Center horizontally
 
-    // Scale context so 10x20 grid fits perfectly
     context.setTransform(1, 0, 0, 1, 0, 0);
-    context.scale(cellSize, cellSize);
+    context.scale(width / 10, height / 20);
 
     // Hold canvas (keep at 80x80 for now)
     holdCanvas.width = 80;
