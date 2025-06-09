@@ -1,10 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
+* {
+  box-sizing: border-box;
+}
+
 html, body {
     margin: 0;
     padding: 0;
     height: 100%;
-    overflow: hidden;  
+    min-height: 100%;
+    overflow: hidden;
+    color: white;
 }
 
 body {
@@ -13,12 +19,18 @@ body {
     flex-direction: column;
     align-items: center;
     margin: 0;
+    padding: 0;
+    height: 100%;
+    min-height: 0;
 }
 .top-container {
     display: flex;
     justify-content: space-between;
-    width: 240px; /* Match the width of the Tetris canvas */
-    align-items: center; /* Align items vertically */
+    width: 100%;
+    max-width: 600px;
+    align-items: center;
+    margin-top: 20px;
+    text-align: center;
 }
 .option-button{
     font-family: 'VT323';
@@ -34,15 +46,72 @@ body {
 }
 
 #game-outer-frame {
+    height: 100vh;
+    min-height: 100vh;
+    width: 100vw;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: #333;
+    color: white;
+}
+
+#game-columns {
+    height: 100vh;
+    min-height: 0;
+    display: flex;
+    flex: 1 1 auto;
+    margin: 0;
+    padding: 0;
+}
+
+#left-col, #right-col {
+    flex: 0 0 350px;
+    min-width: 250px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-start;
+    padding: 24px 24px;
+    height: 100%;
+    box-sizing: border-box;
+    background-color: #444;
+    color: white;
+}
+
+#center-col {
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
     justify-content: center;
+    min-width: 0;
+    min-height: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 100%;
+    width: 100%;
     background-color: #333;
     color: white;
-    border-radius: 5px;
-    width: 100vw;  
-    height: 100vh;  
+}
+
+#game-canvas-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#tetrisCanvas {
+    display: block;
+    background-color: #222;
+    max-width: 100%;
+    max-height: 100%;
+    box-sizing: border-box;
 }
 
 #gameTitle {
@@ -66,13 +135,12 @@ body {
     border-radius: 5px;
 }
 
-#tetrisCanvas {
-    background-color: black;
-}
 #score-line{
     font-weight: bold;
     color: white;
     font-size: 2rem;
+    width: 100%;
+    text-align: center;
 }
 
 #gameOverOverlay {
@@ -102,4 +170,88 @@ body {
     cursor: pointer;
     font-weight: bold;
     font-size: 1.2rem;
+}
+
+#scoreboard {
+    width: 100%;
+    background: #222;
+    border-radius: 8px;
+    padding: 10px;
+    box-sizing: border-box;
+    margin-top: 20px;
+    text-align: center;
+}
+
+#scoreboard h2 {
+    margin: 0 0 10px 0;
+    font-size: 1.3em;
+    text-align: center;
+}
+
+#score-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    color: #fff;
+    font-family: 'VT323', monospace;
+    font-size: 1.2em;
+}
+
+.game-options {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin: 20px 0 20px 0;
+    justify-content: center;
+    align-items: center;
+}
+
+.game-options, .top-container, #score-line, #holdPiece, #scoreboard {
+  align-self: center;
+}
+
+.left-content, .right-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    text-align: center;
+}
+
+.left-content > *, .right-content > * {
+  /* width: 100%; */
+  text-align: center;
+}
+
+.left-content .game-options,
+.left-content .top-container {
+  width: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.left-content h1 {
+  width: 100%;
+  text-align: center;
+}
+
+.left-content .game-options {
+  justify-content: center;
+}
+
+.left-content .top-container {
+  width: 100%;
+  text-align: center;
+}
+
+.left-content #score-line {
+  width: 100%;
+  text-align: center;
+}
+
+.right-content #scoreboard {
+  width: 100%;
+  text-align: center;
 }

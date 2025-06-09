@@ -8,27 +8,45 @@
 </head>
 <body>
     <div id="game-outer-frame">
-            <h1 id="gameTitle">Fuck Ya It's Tetris Bitch</h1>
-        <div class="game-options">
-            <button id="startButton" class="option-button">Start Game</button>
-            <button id="pauseButton" class="option-button">Pause Game</button>
-            <button id="resetButton" class="option-button">Reset Game</button>
-        </div>
-        <div class="top-container">
-            <div id="holdPiece">
-                <!-- Set the canvas size to match the scale of the tetrominoes -->
-                <canvas id="holdCanvas" width="80" height="80"></canvas>
+        <div id="game-columns">
+            <div id="left-col">
+                <div class="left-content">
+                    <h1 id="gameTitle">Fuck Ya It's Tetris Bitch</h1>
+                    <div class="game-options">
+                        <button id="startButton" class="option-button">Start</button>
+                        <button id="pauseButton" class="option-button">Pause</button>
+                        <button id="resetButton" class="option-button">Reset</button>
+                    </div>
+                    <div class="top-container">
+                        <div id="holdPiece">
+                            <!-- Set the canvas size to match the scale of the tetrominoes -->
+                            <canvas id="holdCanvas" width="80" height="80"></canvas>
+                        </div>
+                        <p id="score-line">Score: <span id="score">0</span></p>
+                    </div>
+                </div>
             </div>
-            <p id="score-line">Score: <span id="score">0</span></p>
-        </div>
-        <canvas id="tetrisCanvas" width="240" height="400"></canvas>
-        <div id="gameOverOverlay" style="display:none;">
-            <div class="overlay-content">
-                <p id="gameOverText">Game Over! Try again.</p>
-                <button id="restartButton">Restart</button>
+            <div id="center-col">
+                <div id="game-canvas-container">
+                    <canvas id="tetrisCanvas"></canvas>
+                    <div id="gameOverOverlay" style="display:none;">
+                        <div class="overlay-content">
+                            <p id="gameOverText">Game Over! Try again.</p>
+                            <button id="restartButton">Restart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="right-col">
+                <div class="right-content">
+                    <div id="scoreboard">
+                        <h2>Scoreboard</h2>
+                        <ul id="score-list"></ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <script src="scripts.js"></script>
+    <script type="module" src="scripts.js"></script>
 </body>
 </html>
