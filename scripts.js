@@ -125,9 +125,17 @@ function collide(arena, player) {
     const [m, o] = [player.matrix, player.pos];
     for (let y = 0; y < m.length; ++y) {
         for (let x = 0; x < m[y].length; ++x) {
-            if (m[y][x] !== 0 &&
-                (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) {
-                return true;
+            if (m[y][x] !== 0) {
+                // Check for out-of-bounds (left, right, bottom)
+                if (
+                    y + o.y < 0 ||
+                    y + o.y >= arena.length ||
+                    x + o.x < 0 ||
+                    x + o.x >= arena[0].length ||
+                    (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0
+                ) {
+                    return true;
+                }
             }
         }
     }
@@ -188,6 +196,19 @@ function togglePause() {
     document.getElementById('pauseButton').textContent = isPaused ? 'Resume Game' : 'Pause Game';
 }
 
+// Scoreboard logic
+const scores = [];
+function updateScoreboard() {
+    const scoreList = document.getElementById('score-list');
+    if (!scoreList) return;
+    scoreList.innerHTML = '';
+    scores.slice().reverse().forEach((score, i) => {
+        const li = document.createElement('li');
+        li.textContent = `Game ${scores.length - i}: ${score}`;
+        scoreList.appendChild(li);
+    });
+}
+
 // Resets the player's piece
 function playerReset() {
     const pieces = 'TJLOSZI';
@@ -197,6 +218,9 @@ function playerReset() {
 
     if (collide(arena, player)) {
         arena.forEach(row => row.fill(0));
+        // Store the score and update scoreboard
+        scores.push(player.score);
+        updateScoreboard();
         player.score = 0;
         updateScore();
         gameActive = false;
@@ -462,7 +486,7 @@ const colors = [
 ];
 
 // Creates the game board
-const arena = createMatrix(12, 20);
+const arena = createMatrix(10, 20);
 const player = {
     pos: {x: 0, y: 0},
     matrix: null,
@@ -566,25 +590,28 @@ function resizeCanvas() {
     let availableHeight = rect.height;
     let availableWidth = rect.width;
 
-    // Set height to max possible, width to maintain 1:2 aspect ratio
-    let height = availableHeight;
-    let width = height * 0.5;
-
-    // If width would overflow, adjust height instead
-    if (width > availableWidth) {
+    // Maintain 10:20 aspect ratio and square cells
+    let width, height, cellSize;
+    if (availableWidth / 10 < availableHeight / 20) {
+        // Width is the limiting factor
         width = availableWidth;
-        height = width * 2;
+        cellSize = width / 10;
+        height = cellSize * 20;
+    } else {
+        // Height is the limiting factor
+        height = availableHeight;
+        cellSize = height / 20;
+        width = cellSize * 10;
     }
 
-    // Set canvas size
     canvas.width = width;
     canvas.height = height;
     canvas.style.display = 'block';
-    canvas.style.margin = '0 auto';
+    canvas.style.margin = '0 auto'; // Center horizontally
 
-    // Scale context so 10x20 grid fits
+    // Scale context so 10x20 grid fits perfectly
     context.setTransform(1, 0, 0, 1, 0, 0);
-    context.scale(width / 10, height / 20);
+    context.scale(cellSize, cellSize);
 
     // Hold canvas (keep at 80x80 for now)
     holdCanvas.width = 80;
