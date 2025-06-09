@@ -1,5 +1,5 @@
 import { collide, merge } from './canvas.js';
-import { createRandomPiece } from './pieces.js';
+import { createRandomPiece, rotate } from './pieces.js';
 import { updateScore, updateScoreboard } from './ui.js';
 import { insults } from '../insults.js';
 

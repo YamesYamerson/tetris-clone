@@ -78,6 +78,7 @@ function setupKeyboardControls() {
                 gameState.playerMove(1, gameState.arena);
                 break;
             case 38: // Up arrow
+            case 87: // W key
                 gameState.playerRotate(1, gameState.arena);
                 break;
             case 40: // Down arrow

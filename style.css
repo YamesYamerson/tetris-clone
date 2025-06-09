@@ -26,11 +26,12 @@ body {
 .top-container {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     width: 100%;
     max-width: 600px;
-    align-items: center;
     margin-top: 20px;
-    text-align: center;
+    padding: 0 10px;
+    box-sizing: border-box;
 }
 .option-button{
     font-family: 'VT323';
@@ -125,27 +126,29 @@ body {
 }
 
 #holdPiece {
-    width: 80px; /* Container width */
-    height: 80px; /* Container height */
-    border: 2px solid white; /* Black outline */
-    border-radius: 5px; /* Rounded corners */
+    width: 80px;
+    height: 80px;
+    border: 2px solid white;
+    border-radius: 5px;
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-left: 20px; /* Add some space between score and hold box */
+    background-color: black;
 }
+
 #holdCanvas {
-    /* Set to the actual pixel dimensions you need for the tetrominoes */
-    /* Don't use width and height here to avoid scaling */
     background-color: black;
     border-radius: 5px;
 }
 
-#score-line{
+#score-line {
     font-weight: bold;
     color: white;
     font-size: 2rem;
-    width: 100%;
-    text-align: center;
+    margin: 0;
+    flex: 1;
+    text-align: left;
 }
 
 #gameOverOverlay {
